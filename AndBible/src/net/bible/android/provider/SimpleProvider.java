@@ -63,18 +63,13 @@ public class SimpleProvider extends ContentProvider  {
 	@Override
 	public Cursor query(Uri uri, String[] projection, String selection,
 			String[] selectionArgs, String sortOrder) {
-		
+		List<String> segments = uri.getPathSegments();
 		SwordDocumentFacade swordDocumentFacade = SwordDocumentFacade.getInstance();
-		
 		List<Book> bibles = swordDocumentFacade.getBibles();
-		
 		SwordContentFacade swordContentFacade = SwordContentFacade.getInstance();
-		
-		BibleBook bibleBook = BibleBook.EXOD;
-		Verse verse = new Verse(bibleBook, 1,1);
 		String plainText="";
 		try {
-			plainText = swordContentFacade.getPlainText(bibles.get(0), verse, 5);
+			plainText = swordContentFacade.getPlainText(bibles.get(0), segments.get(1), 200);
 		} catch (BookException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -82,45 +77,12 @@ public class SimpleProvider extends ContentProvider  {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
-		//swordContentFacade.getPlainText(book, key, maxKeyCount)
-
 		String[] row = new String[] { "passage" };
         MatrixCursor matrixCursor = new MatrixCursor(row);
         row = new String[] { plainText };
         matrixCursor.addRow(row);
 		return matrixCursor;
 	}
-
-    private MatrixCursor getPassageCursor(String passage) {
-        String[] row = new String[] { "passage" };
-        MatrixCursor matrixCursor = new MatrixCursor(row);
-        passage = passage.replace(" ", ""); // strip spaces
-        passage = passage.toLowerCase();
-        String assetPath = "passage/" + passage + ".html";
-        InputStream in;
-        BufferedReader reader;
-        String line;
-        String html = "";
-        Log.d("ASSET", assetPath);
-        try {
-            in = getContext().getAssets().open(assetPath);
-            reader = new BufferedReader(new InputStreamReader(in));
-            line = reader.readLine();
-            while (line != null) {
-                html = html + line;
-                line = reader.readLine();
-            }
-            in.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        row = new String[] { html };
-        matrixCursor.addRow(row);
-        return matrixCursor;
-    }
-
-	
 	
 	@Override
 	public int update(Uri uri, ContentValues values, String selection,
