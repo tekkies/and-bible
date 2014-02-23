@@ -21,6 +21,8 @@ import org.crosswire.jsword.index.IndexStatusListener;
 import org.crosswire.jsword.index.search.SearchRequest;
 import org.crosswire.jsword.passage.Key;
 import org.crosswire.jsword.passage.NoSuchKeyException;
+import org.crosswire.jsword.passage.Verse;
+import org.crosswire.jsword.versification.BibleBook;
 import org.jdom2.Content;
 import org.jdom2.Document;
 
@@ -67,12 +69,25 @@ public class SimpleProvider extends ContentProvider  {
 		List<Book> bibles = swordDocumentFacade.getBibles();
 		
 		SwordContentFacade swordContentFacade = SwordContentFacade.getInstance();
+		
+		BibleBook bibleBook = BibleBook.EXOD;
+		Verse verse = new Verse(bibleBook, 1,1);
+		String plainText="";
+		try {
+			plainText = swordContentFacade.getPlainText(bibles.get(0), verse, 5);
+		} catch (BookException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	
 		//swordContentFacade.getPlainText(book, key, maxKeyCount)
 
 		String[] row = new String[] { "passage" };
         MatrixCursor matrixCursor = new MatrixCursor(row);
-        row = new String[] { "This is from and-bible" };
+        row = new String[] { plainText };
         matrixCursor.addRow(row);
 		return matrixCursor;
 	}
