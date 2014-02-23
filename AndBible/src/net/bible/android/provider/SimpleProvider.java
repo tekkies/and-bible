@@ -32,6 +32,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.util.Log;
+import net.bible.service.common.ParseException;
 import net.bible.service.sword.SwordContentFacade;
 import net.bible.service.sword.SwordDocumentFacade;
 
@@ -69,11 +70,13 @@ public class SimpleProvider extends ContentProvider  {
 		SwordContentFacade swordContentFacade = SwordContentFacade.getInstance();
 		String plainText="";
 		try {
-			plainText = swordContentFacade.getPlainText(bibles.get(0), segments.get(1), 200);
-		} catch (BookException e) {
+			Book bible = bibles.get(0);
+			Key key = bible.getKey(segments.get(1));
+			plainText = swordContentFacade.readHtmlText(bible, key);
+		} catch (NoSuchKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (NoSuchKeyException e) {
+		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
